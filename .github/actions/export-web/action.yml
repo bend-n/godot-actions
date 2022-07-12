@@ -1,0 +1,39 @@
+name: Web export
+description: Web export
+
+inputs:
+  git-name:
+    description: Name of commiter
+    required: true
+    default: "bendn"
+  git-email:
+    description: Email of commiter
+    required: true
+    default: "bend.n@outlook.com"
+
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      uses: bend-n/godot-actions/.github/actions/setup-godot@main
+
+    - name: Build
+      run: |
+        mkdir -vp build/web
+        godot -v --export "HTML" ./build/web/index.html
+      shell: bash
+
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: web
+        path: build/web
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@releases/v4
+      with:
+        branch: gh-pages
+        folder: build/web
+        git-config-name: ${{ inputs.git-name }}
+        git-config-email: ${{ inputs.git-email }}
+        single-commit: true

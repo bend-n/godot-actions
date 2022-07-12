@@ -1,0 +1,15 @@
+name: Setup
+description: Setup godot and repo
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: Setup
+      run: |
+        mkdir -v -p ~/.local/share/godot/templates
+        mv /root/.local/share/godot/templates/${GODOT_VERSION}.stable ~/.local/share/godot/templates/${GODOT_VERSION}.stable
+      shell: bash

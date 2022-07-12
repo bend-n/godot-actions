@@ -1,0 +1,37 @@
+name: Push to itch.io
+description: Push the created artifacts to itch.io
+
+inputs:
+  api-key:
+    description: The API key for the itch.io account
+    required: true
+  itch-path:
+    description: "The path to the itch.io project eg: leafo/x-moon"
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Download
+      uses: actions/download-artifact@v3
+
+    - name: Setup butler
+      uses: jdno/setup-butler@v1
+
+    - name: Push
+      run: |
+        [[ -z $ITCH_PATH ]] && ITCH_PATH=bendn/$NAME
+        function push() {
+          channel=$1
+          [[ $channel == mac ]] && echo -e "#!/bin/bash\n"'cd "$(dirname "$0")"||exit;xattr -cr "$(pwd)/$NAME.app";open -n -a "$(pwd)/$NAME.app"' >./mac/run.sh
+          chmod +x **; to_push="$channel"
+          [[ $(find $channel -type f | wc -l) -eq 1 && $channel != "android" ]] && to_push="$(echo $(basename $channel/*) .7z | tr -d " ")" && (cd "$channel" && 7z a -mtm=off -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on "../$to_push" ./*)
+          butler push "$to_push" "$ITCH_PATH:$channel"
+        }
+        push "web"; push "linux"; push "windows"; unzip "mac/$NAME.zip" -d mac/ && rm "mac/$NAME.zip" && push "mac"
+        [[ -d android ]] && rm android/*.idsig && push "android"
+      env:
+        BUTLER_API_KEY: ${{ inputs.api-key }}
+        ITCH_PATH: ${{ inputs.itch-path }}
+      shell: bash

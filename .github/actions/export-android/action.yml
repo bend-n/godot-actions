@@ -1,0 +1,57 @@
+name: Android export
+description: Android export
+
+inputs:
+  android-keystore-base64:
+    description: The base64 encoded keystore
+    required: false
+  android-password:
+    description: The password of the keystore
+    required: false
+    default: android
+
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      uses: bend-n/godot-actions/.github/actions/setup-godot@main
+
+    - name: Setup editor settings
+      # the Dockerfile is supposed to do this for me *grumbles*
+      run: |
+        apt-get update && apt-get install -y curl
+        mkdir -vp ~/.config/godot
+        curl 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/editor-settings.tres' --output ~/.config/godot/editor_settings-3.tres
+
+        # debug keystore is needed for release build /shrug
+        keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999 && mv debug.keystore ~/debug.keystore
+        sed "s@export/android/debug_keystore = \"\"@export/android/debug_keystore = \"$HOME/debug.keystore\"@" -i ~/.config/godot/editor_settings-3.tres
+      shell: bash
+
+    - name: Build (release)
+      if: ${{ inputs.android-keystore-base64 }}
+      run: |
+        echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > ~/release.keystore
+        ANDROID_KEYSTORE_USER=$(keytool -storepass "$ANDROID_KEYSTORE_PASSWORD" -list -v -keystore ~/release.keystore |  grep -E '^Alias name:\s*(.+)$' |  cut -d ' ' -f 3-)
+        sed "s@keystore/release=\"\"@keystore/release=\"$HOME/release.keystore\"@g" -i export_presets.cfg
+        sed 's@keystore/release_user=".*"@keystore/release_user="'$ANDROID_KEYSTORE_USER'"@g' -i export_presets.cfg
+        sed 's@keystore/release_password=".*"@keystore/release_password="'$ANDROID_KEYSTORE_PASSWORD'"@g' -i export_presets.cfg
+        mkdir -vp build/android
+        godot -v --export "Android" ./build/android/$NAME.apk
+      env:
+        ANDROID_KEYSTORE_BASE64: ${{ inputs.android-keystore-base64 }}
+        ANDROID_KEYSTORE_PASSWORD: ${{ inputs.android-password }}
+      shell: bash
+
+    - name: Build (debug)
+      if: ${{ inputs.android-keystore-base64 }} == ""
+      run: |
+        mkdir -vp build/android || true
+        godot -v --export-debug "Android" ./build/android/$NAME.apk
+      shell: bash
+
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: android
+        path: build/android

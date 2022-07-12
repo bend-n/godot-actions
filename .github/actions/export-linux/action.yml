@@ -1,0 +1,19 @@
+name: Linux export
+description: Linux export
+
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      uses: bend-n/godot-actions/.github/actions/setup-godot@main
+
+    - name: Build
+      run: |
+        mkdir -vp build/linux
+        godot -v --export "Linux" ./build/linux/$NAME.x86_64
+      shell: bash
+
+    - uses: actions/upload-artifact@v1
+      with:
+        name: linux
+        path: build/linux

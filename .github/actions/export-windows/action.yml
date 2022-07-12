@@ -1,0 +1,20 @@
+name: "Windows export"
+description: "Windows export"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup
+      uses: bend-n/godot-actions/.github/actions/setup-godot@main
+
+    - name: Windows Build
+      run: |
+        mkdir -vp build/windows
+        godot -v --export "Windows" ./build/windows/$NAME.exe
+      shell: bash
+
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: windows
+        path: build/windows

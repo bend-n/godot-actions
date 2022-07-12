@@ -1,0 +1,20 @@
+name: Mac export
+description: Mac export
+
+runs:
+  using: composite
+  steps:
+    - name: Setup
+      uses: bend-n/godot-actions/.github/actions/setup-godot@main
+
+    - name: Build
+      run: |
+        mkdir -vp build/mac
+        godot -v --export "Mac" ./build/mac/$NAME.zip
+      shell: bash
+
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        name: mac
+        path: build/mac
