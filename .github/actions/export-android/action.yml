@@ -13,13 +13,25 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Setup
+    - name: Setup godot
       uses: bend-n/godot-actions/.github/actions/setup-godot@main
 
-    - name: Setup editor settings
-      # the Dockerfile is supposed to do this for me *grumbles*
+    - name: Setup android sdk
       run: |
-        apt-get update && apt-get install -y curl
+        sudo apt-get update && sudo apt-get install -y adb openjdk-11-jdk-headless ca-certificates python python-openssl
+        export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+        export ANDROID_HOME="/usr/lib/android-sdk"
+        wget -nv https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O tools.zip
+        sudo mkdir -pv "$ANDROID_HOME"
+        sudo unzip tools.zip -d "$ANDROID_HOME/cmdline-tools" && rm tools.zip
+        PATH="${ANDROID_HOME}/cmdline-tools/cmdline-tools/bin:${PATH}"
+        yes | sdkmanager --licenses >/dev/null
+        sudo sdkmanager "platform-tools" "build-tools;30.0.3" "platforms;android-29" "cmdline-tools;latest" "cmake;3.10.2.4988404" "ndk;21.4.7075529"
+
+      shell: bash
+
+    - name: Setup editor settings
+      run: |
         mkdir -vp ~/.config/godot
         curl 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/editor-settings.tres' --output ~/.config/godot/editor_settings-3.tres
 
