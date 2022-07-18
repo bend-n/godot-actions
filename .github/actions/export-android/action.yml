@@ -19,9 +19,7 @@ runs:
     - name: Setup editor settings
       # the Dockerfile is supposed to do this for me *grumbles*
       run: |
-        apt-get update && apt-get install -y curl
-        mkdir -vp ~/.config/godot
-        curl 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/editor-settings.tres' --output ~/.config/godot/editor_settings-3.tres
+        wget -nv 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/editor-settings.tres' -O ~/.config/godot/editor_settings-3.tres
 
         # debug keystore is needed for release build /shrug
         keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999 && mv debug.keystore ~/debug.keystore
