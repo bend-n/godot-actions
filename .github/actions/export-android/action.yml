@@ -19,6 +19,7 @@ runs:
     - name: Setup editor settings
       # the Dockerfile is supposed to do this for me *grumbles*
       run: |
+        mkdir -vp ~/.config/godot/
         wget -nv 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/editor-settings.tres' -O ~/.config/godot/editor_settings-3.tres
 
         # debug keystore is needed for release build /shrug
