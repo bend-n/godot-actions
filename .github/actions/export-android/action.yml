@@ -16,35 +16,55 @@ runs:
     - name: Setup
       uses: bend-n/godot-actions/.github/actions/setup-godot@main
 
+    - name: Download android sdks
+      run: |
+        # Generate android keystore and settings
+        export ANDROID_HOME="/usr/lib/android-sdk"
+        export PATH="${ANDROID_HOME}/cmdline-tools/cmdline-tools/bin:${PATH}"
+        if [[ ! -d ${ANDROID_HOME}/cmdline-tools ]]; then
+          echo "::group::rar"
+          mkdir -vp ${ANDROID_HOME}/cmdline-tools
+          keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999  && mv debug.keystore /root/debug.keystore
+          wget -nv https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O ~/tools.zip 
+          unzip -q ~/tools.zip -d ${ANDROID_HOME}/cmdline-tools && rm ~/tools.zip && echo "Finished unzipping"
+          yes | sdkmanager --licenses > /dev/null && echo "Accepted licenses"
+          sdkmanager "platform-tools" "build-tools;30.0.3" "platforms;android-29" "cmdline-tools;latest" "cmake;3.10.2.4988404" "ndk;21.4.7075529" > /dev/null && echo "Installed Android SDKs"
+          echo "::endgroup::"
+        fi
+      shell: bash
+
     - name: Setup editor settings
-      # the Dockerfile is supposed to do this for me *grumbles*
       run: |
         mkdir -vp ~/.config/godot/
-        wget -nv 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/editor-settings.tres' -O ~/.config/godot/editor_settings-3.tres
-
-        # debug keystore is needed for release build /shrug
-        keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999 && mv debug.keystore ~/debug.keystore
-        sed "s@export/android/debug_keystore = \"\"@export/android/debug_keystore = \"$HOME/debug.keystore\"@" -i ~/.config/godot/editor_settings-3.tres
+        mv /root/.config/godot/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
       shell: bash
 
     - name: Build (release)
       if: ${{ inputs.android-keystore-base64 }}
       run: |
-        echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > ~/release.keystore
-        ANDROID_KEYSTORE_USER=$(keytool -storepass "$ANDROID_KEYSTORE_PASSWORD" -list -v -keystore ~/release.keystore |  grep -E '^Alias name:\s*(.+)$' |  cut -d ' ' -f 3-)
-        sed "s@keystore/release=\"\"@keystore/release=\"$HOME/release.keystore\"@g" -i export_presets.cfg
-        sed 's@keystore/release_user=".*"@keystore/release_user="'$ANDROID_KEYSTORE_USER'"@g' -i export_presets.cfg
-        sed 's@keystore/release_password=".*"@keystore/release_password="'$ANDROID_KEYSTORE_PASSWORD'"@g' -i export_presets.cfg
+        password="${{ inputs.android-password }}"
+        echo "Building in release mode"
+        echo "${{ inputs.android-keystore-base64 }}" | base64 --decode > ~/release.keystore && echo "Decoded keystore"
+        cat ~/release.keystore
+        alias=$(keytool -storepass "$password" -list -v -keystore ~/release.keystore |  grep -E '^Alias name:\s*(.+)$' |  cut -d ' ' -f 3-) && echo "Got alias name"
+        echo "Configuring with $alias, $password"
+        sed "s@keystore/release=\"\"@keystore/release=\"$HOME/release.keystore\"@g" -i export_presets.cfg && sed 's@keystore/release_user=".*"@keystore/release_user="'$alias'"@g' -i export_presets.cfg && sed 's@keystore/release_password=".*"@keystore/release_password="'$password'"@g' -i export_presets.cfg && echo "Configured export_presets.cfg"
         mkdir -vp build/android
         godot -v --export "Android" ./build/android/$NAME.apk
-      env:
-        ANDROID_KEYSTORE_BASE64: ${{ inputs.android-keystore-base64 }}
-        ANDROID_KEYSTORE_PASSWORD: ${{ inputs.android-password }}
+      shell: bash
+
+    - name: Debug (failure)
+      if: ${{ failure() }}
+      run: |
+        cat export_presets.cfg
+        echo '---------------------------'
+        cat ~/.config/godot/editor_settings-3.tres
       shell: bash
 
     - name: Build (debug)
       if: ${{ inputs.android-keystore-base64 }} == ""
       run: |
+        echo "Building in debug mode"
         mkdir -vp build/android || true
         godot -v --export-debug "Android" ./build/android/$NAME.apk
       shell: bash
