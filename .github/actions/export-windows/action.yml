@@ -9,8 +9,10 @@ runs:
 
     - name: Windows Build
       run: |
-        mkdir -vp build/windows
+        echo "::group::Windows Build"
+        mkdir -p build/windows
         godot -v --export "Windows" ./build/windows/$NAME.exe
+        echo "::endgroup::"
       shell: bash
 
     - name: Upload

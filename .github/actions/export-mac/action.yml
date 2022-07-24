@@ -7,10 +7,12 @@ runs:
     - name: Setup
       uses: bend-n/godot-actions/.github/actions/setup-godot@main
 
-    - name: Build
+    - name: Mac Build
       run: |
+        echo "::group::Mac Build"
         mkdir -vp build/mac
         godot -v --export "Mac" ./build/mac/$NAME.zip
+        echo "::endgroup::"
       shell: bash
 
     - name: Upload

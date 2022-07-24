@@ -11,10 +11,12 @@ runs:
         submodules: recursive
     - name: Setup
       run: |
+        echo "::group::Setup godot"
         git config --global --add safe.directory $(pwd)
         git rev-parse --short HEAD > version
         mkdir -v -p ~/.local/share/godot/templates
         [[ -z $RELEASE ]] && RELEASE=stable
         mv /root/.local/share/godot/templates/${GODOT_VERSION}.${RELEASE} ~/.local/share/godot/templates/${GODOT_VERSION}.${RELEASE}
         ls ~/.local/share/godot/templates/${GODOT_VERSION}.${RELEASE} | tr '\n' ' '
+        echo "::endgroup::"
       shell: bash

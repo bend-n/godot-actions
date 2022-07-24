@@ -22,20 +22,20 @@ runs:
         export ANDROID_HOME="/usr/lib/android-sdk"
         export PATH="${ANDROID_HOME}/cmdline-tools/cmdline-tools/bin:${PATH}"
         if [[ ! -d ${ANDROID_HOME}/cmdline-tools ]]; then
-          echo "::group::rar"
-          mkdir -vp ${ANDROID_HOME}/cmdline-tools
+          echo "::group::Downloading Android SDKs"
+          mkdir -p ${ANDROID_HOME}/cmdline-tools
           keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999  && mv debug.keystore /root/debug.keystore
           wget -nv https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip -O ~/tools.zip 
-          unzip -q ~/tools.zip -d ${ANDROID_HOME}/cmdline-tools && rm ~/tools.zip && echo "Finished unzipping"
+          unzip ~/tools.zip -d ${ANDROID_HOME}/cmdline-tools && rm ~/tools.zip && echo "Finished unzipping"
           yes | sdkmanager --licenses > /dev/null && echo "Accepted licenses"
-          sdkmanager "platform-tools" "build-tools;30.0.3" "platforms;android-29" "cmdline-tools;latest" "cmake;3.10.2.4988404" "ndk;21.4.7075529" > /dev/null && echo "Installed Android SDKs"
+          sdkmanager "platform-tools" "build-tools;30.0.3" "platforms;android-29" "cmdline-tools;latest" "cmake;3.10.2.4988404" "ndk;21.4.7075529" && echo "Installed Android SDKs"
           echo "::endgroup::"
         fi
       shell: bash
 
     - name: Setup editor settings
       run: |
-        mkdir -vp ~/.config/godot/
+        mkdir -p ~/.config/godot/
         mv /root/.config/godot/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
       shell: bash
 
@@ -43,30 +43,24 @@ runs:
       if: ${{ inputs.android-keystore-base64 }}
       run: |
         password="${{ inputs.android-password }}"
-        echo "Building in release mode"
+        echo "::group::Build android (release)"
         echo "${{ inputs.android-keystore-base64 }}" | base64 --decode > ~/release.keystore && echo "Decoded keystore"
         cat ~/release.keystore
         alias=$(keytool -storepass "$password" -list -v -keystore ~/release.keystore |  grep -E '^Alias name:\s*(.+)$' |  cut -d ' ' -f 3-) && echo "Got alias name"
         echo "Configuring with $alias, $password"
         sed "s@keystore/release=\"\"@keystore/release=\"$HOME/release.keystore\"@g" -i export_presets.cfg && sed 's@keystore/release_user=".*"@keystore/release_user="'$alias'"@g' -i export_presets.cfg && sed 's@keystore/release_password=".*"@keystore/release_password="'$password'"@g' -i export_presets.cfg && echo "Configured export_presets.cfg"
-        mkdir -vp build/android
+        mkdir -p build/android
         godot -v --export "Android" ./build/android/$NAME.apk
-      shell: bash
-
-    - name: Debug (failure)
-      if: ${{ failure() }}
-      run: |
-        cat export_presets.cfg
-        echo '---------------------------'
-        cat ~/.config/godot/editor_settings-3.tres
+        echo "::endgroup::"
       shell: bash
 
     - name: Build (debug)
       if: ${{ inputs.android-keystore-base64 }} == ""
       run: |
-        echo "Building in debug mode"
-        mkdir -vp build/android || true
+        echo "::group::Build android (debug)"
+        mkdir -p build/android || true
         godot -v --export-debug "Android" ./build/android/$NAME.apk
+        echo "::endgroup::"
       shell: bash
 
     - name: Upload

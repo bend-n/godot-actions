@@ -17,10 +17,12 @@ runs:
     - name: Setup
       uses: bend-n/godot-actions/.github/actions/setup-godot@main
 
-    - name: Build
+    - name: Web Build
       run: |
+        echo "::group::Web Build"
         mkdir -vp build/web
         godot -v --export "HTML" ./build/web/index.html
+        echo "::endgroup::"
       shell: bash
 
     - name: Upload

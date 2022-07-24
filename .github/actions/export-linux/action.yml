@@ -7,10 +7,12 @@ runs:
     - name: Setup
       uses: bend-n/godot-actions/.github/actions/setup-godot@main
 
-    - name: Build
+    - name: Linux Build
       run: |
+        echo "::group::Linux Build"
         mkdir -vp build/linux
         godot -v --export "Linux" ./build/linux/$NAME.x86_64
+        echo "::endgroup::"
       shell: bash
 
     - uses: actions/upload-artifact@v1
