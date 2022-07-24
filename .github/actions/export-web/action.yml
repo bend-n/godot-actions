@@ -31,7 +31,13 @@ runs:
         name: web
         path: build/web
 
+    - name: Test git repo
+      id: is-repo
+      run: "echo ::set-output name=is-repo::$(git rev-parse --is-inside-work-tree || echo false)"
+      shell: bash
+
     - name: Deploy
+      if: steps.is-repo.outputs.is-repo == true
       uses: JamesIves/github-pages-deploy-action@releases/v4
       with:
         branch: gh-pages
