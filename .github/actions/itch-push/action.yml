@@ -24,14 +24,15 @@ runs:
         [[ -z $ITCH_PATH ]] && ITCH_PATH=bendn/$NAME
         function push() {
           channel=$1
+          [[ ! -d $channel ]] && exit 0
           echo "::group::Push $channel"
           [[ $channel == mac ]] && echo -e "#!/bin/bash\n"'cd "$(dirname "$0")"||exit;xattr -cr "$(pwd)/$NAME.app";open -n -a "$(pwd)/$NAME.app"' >./mac/run.sh
-          chmod +x **; to_push="$channel"
-          [[ $(find $channel -type f | wc -l) -eq 1 && $channel != "android" ]] && to_push="$(echo $(basename $channel/*) .7z | tr -d " ")" && (cd "$channel" && 7z a -mtm=off -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on "../$to_push" ./*)
-          butler push "$to_push" "$ITCH_PATH:$channel"
+          chmod +x **;
+          butler push "$channel" "$ITCH_PATH:$channel"
           echo "::endgroup::"
         }
-        push "web"; push "linux"; push "windows"; unzip "mac/$NAME.zip" -d mac/ && rm "mac/$NAME.zip" && push "mac"
+        push "web"; push "linux"; push "windows"; 
+        [[ -d mac ]] && unzip "mac/$NAME.zip" -d mac/ && rm "mac/$NAME.zip" && push "mac"
         [[ -d android ]] && rm android/*.idsig && push "android"
       env:
         BUTLER_API_KEY: ${{ inputs.api-key }}

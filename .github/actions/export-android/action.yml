@@ -45,7 +45,6 @@ runs:
         password="${{ inputs.android-password }}"
         echo "::group::Build android (release)"
         echo "${{ inputs.android-keystore-base64 }}" | base64 --decode > ~/release.keystore && echo "Decoded keystore"
-        cat ~/release.keystore
         alias=$(keytool -storepass "$password" -list -v -keystore ~/release.keystore |  grep -E '^Alias name:\s*(.+)$' |  cut -d ' ' -f 3-) && echo "Got alias name"
         echo "Configuring with $alias, $password"
         sed "s@keystore/release=\"\"@keystore/release=\"$HOME/release.keystore\"@g" -i export_presets.cfg && sed 's@keystore/release_user=".*"@keystore/release_user="'$alias'"@g' -i export_presets.cfg && sed 's@keystore/release_password=".*"@keystore/release_password="'$password'"@g' -i export_presets.cfg && echo "Configured export_presets.cfg"
