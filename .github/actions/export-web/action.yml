@@ -37,7 +37,7 @@ runs:
       shell: bash
 
     - name: Deploy
-      if: steps.is-repo.outputs.is-repo == true
+      if: steps.is-repo.outputs.is-repo == 'true'
       uses: JamesIves/github-pages-deploy-action@releases/v4
       with:
         branch: gh-pages
