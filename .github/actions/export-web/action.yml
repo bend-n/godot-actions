@@ -17,27 +17,36 @@ runs:
     - name: Setup
       uses: bend-n/godot-actions/.github/actions/setup-godot@main
 
+    - name: Get export name
+      id: get-export-name
+      uses: bend-n/godot-actions/.github/actions/get-export-name@main
+      with:
+        platform: HTML5
+
     - name: Web Build
+      if: steps.get-export-name.outputs.export-name
       run: |
         echo "::group::Web Build"
         mkdir -vp build/web
-        godot -v --export "HTML" ./build/web/index.html
+        godot -v --export "${{ steps.get-export-name.outputs.export-name }}" ./build/web/index.html
         echo "::endgroup::"
       shell: bash
 
     - name: Upload
+      if: steps.get-export-name.outputs.export-name
       uses: actions/upload-artifact@v1
       with:
         name: web
         path: build/web
 
     - name: Test git repo
+      if: steps.get-export-name.outputs.export-name
       id: is-repo
       run: "echo ::set-output name=is-repo::$(git rev-parse --is-inside-work-tree || echo false)"
       shell: bash
 
     - name: Deploy
-      if: steps.is-repo.outputs.is-repo == 'true'
+      if: steps.is-repo.outputs.is-repo == 'true' && steps.get-export-name.outputs.export-name
       uses: JamesIves/github-pages-deploy-action@releases/v4
       with:
         branch: gh-pages
@@ -45,3 +54,4 @@ runs:
         git-config-name: ${{ inputs.git-name }}
         git-config-email: ${{ inputs.git-email }}
         single-commit: true
+        silent: true

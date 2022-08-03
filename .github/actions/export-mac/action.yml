@@ -7,15 +7,23 @@ runs:
     - name: Setup
       uses: bend-n/godot-actions/.github/actions/setup-godot@main
 
+    - name: Get export name
+      id: get-export-name
+      uses: bend-n/godot-actions/.github/actions/get-export-name@main
+      with:
+        platform: "Mac OSX"
+
     - name: Mac Build
+      if: steps.get-export-name.outputs.export-name
       run: |
         echo "::group::Mac Build"
         mkdir -vp build/mac
-        godot -v --export "Mac" ./build/mac/$NAME.zip
+        godot -v --export "${{ steps.get-export-name.outputs.export-name }}" ./build/mac/$NAME.zip
         echo "::endgroup::"
       shell: bash
 
     - name: Upload
+      if: steps.get-export-name.outputs.export-name
       uses: actions/upload-artifact@v1
       with:
         name: mac

@@ -7,15 +7,23 @@ runs:
     - name: Setup
       uses: bend-n/godot-actions/.github/actions/setup-godot@main
 
+    - name: Get export name
+      id: get-export-name
+      uses: bend-n/godot-actions/.github/actions/get-export-name@main
+      with:
+        platform: "Windows Desktop"
+
     - name: Windows Build
+      if: steps.get-export-name.outputs.export-name
       run: |
         echo "::group::Windows Build"
         mkdir -p build/windows
-        godot -v --export "Windows" ./build/windows/$NAME.exe
+        godot -v --export "${{ steps.get-export-name.outputs.export-name }}" ./build/windows/$NAME.exe
         echo "::endgroup::"
       shell: bash
 
     - name: Upload
+      if: steps.get-export-name.outputs.export-name
       uses: actions/upload-artifact@v1
       with:
         name: windows

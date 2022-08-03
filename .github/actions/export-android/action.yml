@@ -16,7 +16,14 @@ runs:
     - name: Setup
       uses: bend-n/godot-actions/.github/actions/setup-godot@main
 
+    - name: Get export name
+      id: get-export-name
+      uses: bend-n/godot-actions/.github/actions/get-export-name@main
+      with:
+        platform: Android
+
     - name: Download android sdks
+      if: steps.get-export-name.outputs.export-name
       run: |
         # Generate android keystore and settings
         export ANDROID_HOME="/usr/lib/android-sdk"
@@ -34,35 +41,36 @@ runs:
       shell: bash
 
     - name: Setup editor settings
+      if: steps.get-export-name.outputs.export-name
       run: |
         mkdir -p ~/.config/godot/
         mv /root/.config/godot/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
       shell: bash
 
     - name: Build (release)
-      if: ${{ inputs.android-keystore-base64 }}
+      if: inputs.android-keystore-base64 && steps.get-export-name.outputs.export-name
       run: |
         password="${{ inputs.android-password }}"
         echo "::group::Build android (release)"
         echo "${{ inputs.android-keystore-base64 }}" | base64 --decode > ~/release.keystore && echo "Decoded keystore"
         alias=$(keytool -storepass "$password" -list -v -keystore ~/release.keystore |  grep -E '^Alias name:\s*(.+)$' |  cut -d ' ' -f 3-) && echo "Got alias name"
-        echo "Configuring with $alias, $password"
         sed "s@keystore/release=\"\"@keystore/release=\"$HOME/release.keystore\"@g" -i export_presets.cfg && sed 's@keystore/release_user=".*"@keystore/release_user="'$alias'"@g' -i export_presets.cfg && sed 's@keystore/release_password=".*"@keystore/release_password="'$password'"@g' -i export_presets.cfg && echo "Configured export_presets.cfg"
         mkdir -p build/android
-        godot -v --export "Android" ./build/android/$NAME.apk
+        godot -v --export "${{steps.get-export-name.outputs.export-name}}" ./build/android/$NAME.apk
         echo "::endgroup::"
       shell: bash
 
     - name: Build (debug)
-      if: ${{ inputs.android-keystore-base64 }} == ""
+      if: ${{ ! inputs.android-keystore-base64 && steps.get-export-name.outputs.export-name }}
       run: |
         echo "::group::Build android (debug)"
         mkdir -p build/android || true
-        godot -v --export-debug "Android" ./build/android/$NAME.apk
+        godot -v --export-debug "${{steps.get-export-name.outputs.export-name}}" ./build/android/$NAME.apk
         echo "::endgroup::"
       shell: bash
 
     - name: Upload
+      if: steps.get-export-name.outputs.export-name
       uses: actions/upload-artifact@v1
       with:
         name: android

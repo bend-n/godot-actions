@@ -7,11 +7,8 @@ runs:
     - name: Check if clean
       id: clean
       run: |
-        if [[ -z $(find . -mindepth 1 -maxdepth 1) ]]; then
-          echo "::set-output name=clean::true" && echo "clean" 
-        else
-          echo "::set-output name=clean::false" && echo "dirty"
-        fi
+        if [[ -z $(find . -mindepth 1 -maxdepth 1) ]]; then echo "::set-output name=clean::true";
+        else echo "::set-output name=clean::false"; fi
       shell: bash
 
     - name: Checkout
@@ -21,7 +18,13 @@ runs:
         fetch-depth: 0
         lfs: true
         submodules: recursive
-    - name: Setup
+
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+
+    - name: Setup godot
       run: |
         echo "::group::Setup godot"
         git config --global --add safe.directory $(pwd)
