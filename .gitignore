@@ -1,7 +1,6 @@
 .import/
 logs/
 *.sh
-*.py
 *.pgn
 .vscode/
 exports/
