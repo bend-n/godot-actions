@@ -26,7 +26,7 @@ runs:
           channel=$1
           [[ ! -d $channel ]] && exit 0
           echo "::group::Push $channel"
-          [[ $channel == mac ]] && echo -e "#!/bin/bash\n"'cd "$(dirname "$0")"||exit;xattr -cr "$(pwd)/$NAME.app";open -n -a "$(pwd)/$NAME.app"' >./mac/run.sh
+          [[ $channel == mac ]] && echo -e "#!/bin/bash\nNAME=$NAME\n"'cd "$(dirname "$0")"||exit;xattr -cr "$(pwd)/$NAME.app";open -n -a "$(pwd)/$NAME.app"' >./mac/run.sh
           chmod +x **;
           butler push "$channel" "$ITCH_PATH:$channel"
           echo "::endgroup::"
