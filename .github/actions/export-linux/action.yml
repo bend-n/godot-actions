@@ -22,7 +22,7 @@ runs:
         echo "::endgroup::"
       shell: bash
 
-    - uses: actions/upload-artifact@v1
+    - uses: actions/upload-artifact@v3
       if: steps.get-export-name.outputs.export-name
       with:
         name: linux

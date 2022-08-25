@@ -24,7 +24,7 @@ runs:
 
     - name: Upload
       if: steps.get-export-name.outputs.export-name
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: windows
         path: build/windows

@@ -34,7 +34,7 @@ runs:
 
     - name: Upload
       if: steps.get-export-name.outputs.export-name
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: web
         path: build/web
@@ -47,7 +47,7 @@ runs:
 
     - name: Deploy
       if: steps.is-repo.outputs.is-repo == 'true' && steps.get-export-name.outputs.export-name
-      uses: JamesIves/github-pages-deploy-action@releases/v4
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
         branch: gh-pages
         folder: build/web
