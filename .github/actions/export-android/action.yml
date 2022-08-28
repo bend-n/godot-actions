@@ -40,13 +40,6 @@ runs:
         fi
       shell: bash
 
-    - name: Setup editor settings
-      if: steps.get-export-name.outputs.export-name
-      run: |
-        mkdir -p ~/.config/godot/
-        mv /root/.config/godot/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
-      shell: bash
-
     - name: Build (release)
       if: inputs.android-keystore-base64 && steps.get-export-name.outputs.export-name
       run: |

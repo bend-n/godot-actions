@@ -27,12 +27,22 @@ runs:
     - name: Setup godot
       run: |
         echo "::group::Setup godot"
-        git config --global --add safe.directory $(pwd)
-        printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)" > version
-        mkdir -v -p ~/.local/share/godot/templates
+
+        # config
+        mkdir -p ~/.config/godot/
+        mv /root/.config/godot/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
+
+        # create version label thing
+        git config --global --add safe.directory "$(pwd)" && printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)" > version
+
+        # templates
         [[ -z $RELEASE ]] && RELEASE=stable
-        mv /root/.local/share/godot/templates/${GODOT_VERSION}.${RELEASE} ~/.local/share/godot/templates/${GODOT_VERSION}.${RELEASE}
-        ls ~/.local/share/godot/templates/${GODOT_VERSION}.${RELEASE} | tr '\n' ' '
+        TEMPLATES_PATH=".local/share/godot/templates/${GODOT_VERSION}.${RELEASE}"
+        mkdir -p "${HOME}/${TEMPLATES_PATH}"
+        mv "/root/${TEMPLATES_PATH}/"* "${HOME}/${TEMPLATES_PATH}"
+        ls "${HOME}/${TEMPLATES_PATH}"| tr '\n' ' '
+
+        # gpm
         if [[ -f godot.package ]]; then
           [[ ! -d addons ]] && mkdir addons
           git clone --depth 1 https://github.com/you-win/godot-package-manager

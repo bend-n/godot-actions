@@ -17,6 +17,8 @@ runs:
       if: steps.get-export-name.outputs.export-name
       run: |
         echo "::group::Windows Build"
+        export WINEPREFIX="$HOME/wineprefix"
+        mkdir "$WINEPREFIX" && chown -R "${USER}:" "$WINEPREFIX"
         mkdir -p build/windows
         godot -v --export "${{ steps.get-export-name.outputs.export-name }}" ./build/windows/$NAME.exe
         echo "::endgroup::"
