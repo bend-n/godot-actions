@@ -22,6 +22,12 @@ runs:
         echo "::endgroup::"
       shell: bash
 
+    - name: Add extra files
+      if: steps.get-export-name.outputs.export-name
+      run: |
+        [[ -f .github/post_export ]] && chmod +x .github/post_export && ./.github/post_export linux
+      shell: bash
+
     - uses: actions/upload-artifact@v3
       if: steps.get-export-name.outputs.export-name
       with:

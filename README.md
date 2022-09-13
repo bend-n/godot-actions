@@ -1,7 +1,7 @@
 # godot-actions
 
 [![license](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](https://github.com/bend-n/godot-actions/blob/main/LICENSE "License")
-[![version](https://img.shields.io/badge/3.5>3.x-blue?logo=godot-engine&logoColor=white&label=godot&style=for-the-badge)](https://godotengine.org)
+[![version](https://img.shields.io/badge/>3.5-blue?logo=godot-engine&logoColor=white&label=godot&style=for-the-badge)](https://godotengine.org)
 <a href='https://ko-fi.com/bendn' title='Buy me a coffee' target='_blank'><img height='28' src='https://storage.ko-fi.com/cdn/brandasset/kofi_button_red.png' alt='Buy me a coffee'> </a>
 
 Github Actions composite action repository.
@@ -119,15 +119,15 @@ jobs:
 
 </details>
 
-### Users
+### Configuration
 
-[bendn/chess](https://github.com/bend-n/chess)
-[bendn/tetris](https://github.com/bend-n/tetris)
-[bendn/spaceshooty](https://github.com/bend-n/tetris)
-[bendn/remap](https://github.com/bend-n/remap)
-[bendn/latex-bot](https://github.com/bend-n/latex-bot)
-[bendn/swipe-detector](https://github.com/bend-n/swipe-detector)
-[bendn/code-image](https://github.com/bend-n/code-image)
-[bendn/gd-eval](https://github.com/bend-n/gd-eval)
-[bendn/sokoban](https://github.com/bend-n/sokoban)
-[bendn/godot-template](https://github.com/bend-n/godot-template)
+> **Note** If script is not compiled, it must contain a [shebang](<https://en.wikipedia.org/wiki/Shebang_(Unix)>)
+
+Create a file `./.github/post_export` that will be run after installation. The executable will be run with a argument, containing the platform. (eg: `./.github/post_export linux`)
+
+Bash example:
+
+```bash
+#!/bin/bash
+[[ $1 == "web" ]] && wget -nv "example.org" -O build/web/example.html
+```
