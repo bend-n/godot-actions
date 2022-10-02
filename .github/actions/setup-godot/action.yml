@@ -43,7 +43,7 @@ runs:
         ls "${HOME}/${TEMPLATES_PATH}"| tr '\n' ' '
 
         # gpm
-        if [[ -f godot.package ]] && chmod +x .github/post_export; then
+        if [[ -f godot.package ]]; then
           [[ ! -d addons ]] && mkdir addons
           git clone --depth 1 https://github.com/you-win/godot-package-manager
           mv godot-package-manager/addons/godot-package-manager addons/

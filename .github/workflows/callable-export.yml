@@ -1,0 +1,100 @@
+name: "export"
+on:
+  workflow_call:
+    inputs:
+      godot-version:
+        default: 3.5
+        required: true
+        type: number
+      image:
+        default: ghcr.io/bend-n/godot-2d:3.5
+        type: string
+        required: true
+      export-name:
+        default: ${{ github.event.repository.name }}
+        required: true
+        type: string
+      platforms: # space seperated platform list
+        default: "windows linux web android mac"
+        required: true
+        type: string
+    secrets:
+      android-keystore-base64: # will be filled with andrid debug keystore if left blank
+        required: false
+      android-keystore-password:
+        required: false
+      butler-api-key:
+        required: false
+
+env:
+  GODOT_VERSION: ${{ inputs.godot-version }}
+  NAME: ${{ inputs.export-name }}
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    if: contains(${{ inputs.platforms }}, ${{ github.job }})
+    container:
+      image: ${{ inputs.image }}
+    name: Linux
+    steps:
+      - name: Build
+        uses: bend-n/godot-actions/.github/actions/export-linux@main
+
+  windows:
+    runs-on: ubuntu-latest
+    if: contains(${{ inputs.platforms }}, ${{ github.job }})
+    container:
+      image: ${{ inputs.image }}
+    name: Windows
+    steps:
+      - name: Build
+        uses: bend-n/godot-actions/.github/actions/export-windows@main
+
+  mac:
+    runs-on: ubuntu-latest
+    if: contains(${{ inputs.platforms }}, ${{ github.job }})
+    container:
+      image: ${{ inputs.image }}
+    name: macOS
+    steps:
+      - name: Build
+        uses: bend-n/godot-actions/.github/actions/export-mac@main
+
+  web:
+    runs-on: ubuntu-latest
+    if: contains(${{ inputs.platforms }}, ${{ github.job }})
+    container:
+      image: ${{ inputs.image }}
+    name: HTML5
+    steps:
+      - name: Build
+        uses: bend-n/godot-actions/.github/actions/export-web@main
+
+  android:
+    runs-on: ubuntu-latest
+    if: contains(${{ inputs.platforms }}, ${{ github.job }})
+    container:
+      image: ${{ inputs.image }}
+    name: Android
+    steps:
+      - name: Build
+        uses: bend-n/godot-actions/.github/actions/export-android@main
+        with:
+          android-keystore-base64: ${{ secrets.android-keystore-base64 }}
+          android-password: ${{ secrets.android-keystore-password }}
+
+  push-itch:
+    needs: [linux, android, windows, mac, web]
+    name: Push to itch.io
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check for api key
+        id: secret
+        run: echo '::set-output name=secret::${{ secrets.butler-api-key }}'
+
+      - name: Push
+        if: steps.secret.outputs.secret
+        uses: bend-n/godot-actions/.github/actions/itch-push@main
+        with:
+          api-key: ${{ secrets.butler-api-key }}

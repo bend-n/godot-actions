@@ -65,7 +65,10 @@ runs:
     - name: Add extra files
       if: steps.get-export-name.outputs.export-name
       run: |
-        [[ -f .github/post_export ]] && chmod +x .github/post_export && .github/post_export android
+        if [[ -f .github/post_export ]]; then
+          chmod +x .github/post_export
+          ./.github/post_export android
+        fi
       shell: bash
 
     - name: Upload
