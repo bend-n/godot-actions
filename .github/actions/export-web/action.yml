@@ -24,16 +24,14 @@ runs:
         platform: HTML5
 
     - name: Web Build
-      if: steps.get-export-name.outputs.export-name
       run: |
         echo "::group::Web Build"
         mkdir -vp build/web
-        godot -v --export "${{ steps.get-export-name.outputs.export-name }}" ./build/web/index.html
+        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/web/index.html)"
         echo "::endgroup::"
       shell: bash
 
     - name: Add extra files
-      if: steps.get-export-name.outputs.export-name
       run: |
         if [[ -f .github/post_export ]]; then
           chmod +x .github/post_export
@@ -42,14 +40,12 @@ runs:
       shell: bash
 
     - name: Upload
-      if: steps.get-export-name.outputs.export-name
       uses: actions/upload-artifact@v3
       with:
         name: web
         path: build/web
 
     - name: Test git repo
-      if: steps.get-export-name.outputs.export-name
       id: is-repo
       run: "echo ::set-output name=is-repo::$(git rev-parse --is-inside-work-tree || echo false)"
       shell: bash

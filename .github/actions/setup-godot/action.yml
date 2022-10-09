@@ -31,6 +31,10 @@ runs:
         # config
         mkdir -p ~/.config/godot/
         mv /root/.config/godot/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
+        if [[ -z $PROJECT_PATH ]]; then
+          cd "$PROJECT_PATH"
+          echo "PROJECT_PATH=." >> $GITHUB_ENV
+        fi
 
         # create version label thing
         git config --global --add safe.directory "$(pwd)" && printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)" > version

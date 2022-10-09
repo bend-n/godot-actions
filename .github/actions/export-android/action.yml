@@ -23,7 +23,6 @@ runs:
         platform: Android
 
     - name: Download android sdks
-      if: steps.get-export-name.outputs.export-name
       run: |
         # Generate android keystore and settings
         export ANDROID_HOME="/usr/lib/android-sdk"
@@ -41,7 +40,7 @@ runs:
       shell: bash
 
     - name: Build (release)
-      if: inputs.android-keystore-base64 && steps.get-export-name.outputs.export-name
+      if: inputs.android-keystore-base64
       run: |
         password="${{ inputs.android-password }}"
         echo "::group::Build android (release)"
@@ -49,21 +48,20 @@ runs:
         alias=$(keytool -storepass "$password" -list -v -keystore ~/release.keystore |  grep -E '^Alias name:\s*(.+)$' |  cut -d ' ' -f 3-) && echo "Got alias name"
         sed "s@keystore/release=\"\"@keystore/release=\"$HOME/release.keystore\"@g" -i export_presets.cfg && sed 's@keystore/release_user=".*"@keystore/release_user="'$alias'"@g' -i export_presets.cfg && sed 's@keystore/release_password=".*"@keystore/release_password="'$password'"@g' -i export_presets.cfg && echo "Configured export_presets.cfg"
         mkdir -p build/android
-        godot -v --export "${{steps.get-export-name.outputs.export-name}}" ./build/android/$NAME.apk
+        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/android/${{ env.name }}.apk)"
         echo "::endgroup::"
       shell: bash
 
     - name: Build (debug)
-      if: ${{ ! inputs.android-keystore-base64 && steps.get-export-name.outputs.export-name }}
+      if: ${{ !inputs.android-keystore-base64 }}
       run: |
         echo "::group::Build android (debug)"
         mkdir -p build/android || true
-        godot -v --export-debug "${{steps.get-export-name.outputs.export-name}}" ./build/android/$NAME.apk
+        godot -v --path "${{ env.PROJECT_PATH }}" --export-debug "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/android/${{ env.name }}.apk)"
         echo "::endgroup::"
       shell: bash
 
     - name: Add extra files
-      if: steps.get-export-name.outputs.export-name
       run: |
         if [[ -f .github/post_export ]]; then
           chmod +x .github/post_export
@@ -72,7 +70,6 @@ runs:
       shell: bash
 
     - name: Upload
-      if: steps.get-export-name.outputs.export-name
       uses: actions/upload-artifact@v3
       with:
         name: android

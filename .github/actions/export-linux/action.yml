@@ -14,16 +14,14 @@ runs:
         platform: Linux/X11
 
     - name: Linux Build
-      if: steps.get-export-name.outputs.export-name
       run: |
         echo "::group::Linux Build"
         mkdir -vp build/linux
-        godot -v --export "${{ steps.get-export-name.outputs.export-name }}" ./build/linux/$NAME.x86_64
+        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/linux/${{ env.name }}.x86_64)"
         echo "::endgroup::"
       shell: bash
 
     - name: Add extra files
-      if: steps.get-export-name.outputs.export-name
       run: |
         if [[ -f .github/post_export ]]; then
           chmod +x .github/post_export
@@ -32,7 +30,6 @@ runs:
       shell: bash
 
     - uses: actions/upload-artifact@v3
-      if: steps.get-export-name.outputs.export-name
       with:
         name: linux
         path: build/linux

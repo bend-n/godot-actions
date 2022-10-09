@@ -14,16 +14,14 @@ runs:
         platform: "Mac OSX"
 
     - name: Mac Build
-      if: steps.get-export-name.outputs.export-name
       run: |
         echo "::group::Mac Build"
         mkdir -vp build/mac
-        godot -v --export "${{ steps.get-export-name.outputs.export-name }}" ./build/mac/$NAME.zip
+        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/mac/${{ env.name }}.zip)"
         echo "::endgroup::"
       shell: bash
 
     - name: Add extra files
-      if: steps.get-export-name.outputs.export-name
       run: |
         if [[ -f .github/post_export ]]; then
           chmod +x .github/post_export
@@ -32,7 +30,6 @@ runs:
       shell: bash
 
     - name: Upload
-      if: steps.get-export-name.outputs.export-name
       uses: actions/upload-artifact@v3
       with:
         name: mac

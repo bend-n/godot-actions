@@ -18,6 +18,10 @@ on:
         default: "windows linux web android mac"
         required: true
         type: string
+      project-root-path: # the root folder, relative to your repo, or an absolute path.
+        default: "."
+        required: false
+        type: string
     secrets:
       android-keystore-base64: # will be filled with andrid debug keystore if left blank
         required: false
@@ -28,6 +32,7 @@ on:
 
 env:
   GODOT_VERSION: ${{ inputs.godot-version }}
+  PROJECT_PATH: ${{ inputs.project-root-path }}
   NAME: ${{ inputs.export-name }}
 
 jobs:
