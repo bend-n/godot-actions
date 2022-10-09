@@ -38,7 +38,7 @@ env:
 jobs:
   linux:
     runs-on: ubuntu-latest
-    if: contains(${{ inputs.platforms }}, ${{ github.job }})
+    if: contains(inputs.platforms, 'linux')
     container:
       image: ${{ inputs.image }}
     name: Linux
@@ -48,7 +48,7 @@ jobs:
 
   windows:
     runs-on: ubuntu-latest
-    if: contains(${{ inputs.platforms }}, ${{ github.job }})
+    if: contains(inputs.platforms, 'windows')
     container:
       image: ${{ inputs.image }}
     name: Windows
@@ -58,7 +58,7 @@ jobs:
 
   mac:
     runs-on: ubuntu-latest
-    if: contains(${{ inputs.platforms }}, ${{ github.job }})
+    if: contains(inputs.platforms, 'mac')
     container:
       image: ${{ inputs.image }}
     name: macOS
@@ -68,7 +68,7 @@ jobs:
 
   web:
     runs-on: ubuntu-latest
-    if: contains(${{ inputs.platforms }}, ${{ github.job }})
+    if: contains(inputs.platforms, 'web')
     container:
       image: ${{ inputs.image }}
     name: HTML5
@@ -78,7 +78,7 @@ jobs:
 
   android:
     runs-on: ubuntu-latest
-    if: contains(${{ inputs.platforms }}, ${{ github.job }})
+    if: contains(inputs.platforms, 'android')
     container:
       image: ${{ inputs.image }}
     name: Android
