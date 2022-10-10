@@ -48,7 +48,7 @@ runs:
         alias=$(keytool -storepass "$password" -list -v -keystore ~/release.keystore |  grep -E '^Alias name:\s*(.+)$' |  cut -d ' ' -f 3-) && echo "Got alias name"
         sed "s@keystore/release=\"\"@keystore/release=\"$HOME/release.keystore\"@g" -i export_presets.cfg && sed 's@keystore/release_user=".*"@keystore/release_user="'$alias'"@g' -i export_presets.cfg && sed 's@keystore/release_password=".*"@keystore/release_password="'$password'"@g' -i export_presets.cfg && echo "Configured export_presets.cfg"
         mkdir -p build/android
-        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/android/${{ env.name }}.apk)"
+        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/android/${{ env.NAME }}.apk)"
         echo "::endgroup::"
       shell: bash
 
@@ -57,7 +57,7 @@ runs:
       run: |
         echo "::group::Build android (debug)"
         mkdir -p build/android || true
-        godot -v --path "${{ env.PROJECT_PATH }}" --export-debug "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/android/${{ env.name }}.apk)"
+        godot -v --path "${{ env.PROJECT_PATH }}" --export-debug "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/android/${{ env.NAME }}.apk)"
         echo "::endgroup::"
       shell: bash
 

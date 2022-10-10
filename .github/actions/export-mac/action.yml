@@ -17,7 +17,7 @@ runs:
       run: |
         echo "::group::Mac Build"
         mkdir -vp build/mac
-        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/mac/${{ env.name }}.zip)"
+        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/mac/${{ env.NAME }}.zip)"
         echo "::endgroup::"
       shell: bash
 

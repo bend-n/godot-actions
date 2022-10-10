@@ -19,7 +19,7 @@ runs:
         export WINEPREFIX="$HOME/wineprefix"
         mkdir "$WINEPREFIX" && chown -R "${USER}:" "$WINEPREFIX"
         mkdir -p build/windows
-        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/windows/${{ env.name }}.exe)"
+        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/windows/${{ env.NAME }}.exe)"
         echo "::endgroup::"
       shell: bash
 

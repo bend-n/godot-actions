@@ -17,7 +17,7 @@ runs:
       run: |
         echo "::group::Linux Build"
         mkdir -vp build/linux
-        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/linux/${{ env.name }}.x86_64)"
+        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/linux/${{ env.NAME }}.x86_64)"
         echo "::endgroup::"
       shell: bash
 
