@@ -91,15 +91,11 @@ jobs:
 
   push-itch:
     needs: [linux, android, windows, mac, web]
+    if: always() && inputs.butler-api-key # run even if the previous jobs were skipped
     name: Push to itch.io
     runs-on: ubuntu-20.04
     steps:
-      - name: Check for api key
-        id: secret
-        run: echo '::set-output name=secret::${{ secrets.butler-api-key }}'
-
       - name: Push
-        if: steps.secret.outputs.secret
         uses: bend-n/godot-actions/.github/actions/itch-push@main
         with:
           api-key: ${{ secrets.butler-api-key }}
