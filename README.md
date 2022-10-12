@@ -31,23 +31,23 @@ build-windows:
 <summary>Full example</summary>
 
 > **Note**
-> This is a copy of [godot-template/.github/workflows/export.yml](https://github.com/bend-n/godot-template/blob/dd6e014d5329b4aaf3ad32f110c5ea406777a6fc/.github/workflows/export.yml)
+> This is a copy of [godot-template/.github/workflows/export.yml](https://github.com/bend-n/godot-template/blob/56b004dc6ad80b93549a15d4368e6fd953b26076/.github/workflows/export.yml)
 
 ```yaml
 name: "export" # name of the workflow
 on: # when it is triggered
-  workflow_dispatch: # manually
-  push: # on push
+  workflow_dispatch: # manually or
+  push: # on a push
+    branches:
+      - main # to this branch
     paths: # with modifications to these files
-      - "**.gd"
-      - "**.tscn"
-      - "**.import"
-      - "**.tres"
-      - "**.ttf"
-      - ".github/workflows/export.yml"
-      - "export_presets.cfg"
-    branches: # on this branch
-      - main
+      - "**.gd" # all gdscript files
+      - "**.tscn" # scene files
+      - "**.import" # this means a png changed
+      - "**.tres" # godot resources
+      - "**.ttf" # fonts in godot3 dont have their own .import
+      - ".github/workflows/export.yml" # this workflow
+      - "export_presets.cfg" # the export template
 
 jobs: # the things to do
   export: # a thing to do
@@ -57,6 +57,7 @@ jobs: # the things to do
       godot-version: 3.5 # the godot version
       image: ghcr.io/bend-n/godot-2d:3.5 # the container to use
       platforms: "windows linux web android mac" # space seperated list of platforms to build
+      project-root-path: "." # the directory that project.godot is in
     secrets: # secrets
       android-keystore-base64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }} # not required
       android-keystore-password: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} # not required
