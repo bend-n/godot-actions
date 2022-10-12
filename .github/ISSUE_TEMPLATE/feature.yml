@@ -1,0 +1,17 @@
+name: Feature Request
+description: Request a new feature
+labels: ["enhancement"]
+assignees:
+  - bendn
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to request a new feature!
+  - type: textarea
+    attributes:
+      label: What would you like to see changed/added?
+      description: Give some examples to make it clear!
+      placeholder: Cool thing!
+      value: "A rocketship that goes to the moon when you press `a`"
+    validations:
+      required: true
