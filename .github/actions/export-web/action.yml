@@ -10,6 +10,10 @@ inputs:
     description: Email of commiter
     required: true
     default: "bend.n@outlook.com"
+  github-pages:
+    description: To gh pages, or not to gh pages, that is the question.
+    required: true
+    default: "true"
 
 runs:
   using: composite
@@ -51,7 +55,7 @@ runs:
       shell: bash
 
     - name: Deploy
-      if: steps.is-repo.outputs.is-repo == 'true' && steps.get-export-name.outputs.export-name
+      if: steps.is-repo.outputs.is-repo == 'true' && inputs.github-pages == 'true'
       uses: JamesIves/github-pages-deploy-action@v4
       with:
         branch: gh-pages

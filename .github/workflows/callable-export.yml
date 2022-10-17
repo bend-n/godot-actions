@@ -3,31 +3,44 @@ on:
   workflow_call:
     inputs:
       godot-version:
+        description: the godot version
         default: 3.5
         required: true
         type: number
       image:
+        description: the container to use
         default: ghcr.io/bend-n/godot-2d:3.5
         type: string
         required: true
       export-name:
+        description: the name of the exec. ($export-name.exe)
         default: ${{ github.event.repository.name }}
         required: true
         type: string
-      platforms: # space seperated platform list
+      platforms:
+        description: space seperated platform list
         default: "windows linux web android mac"
         required: true
         type: string
-      project-root-path: # the root folder, relative to your repo, or an absolute path.
+      project-root-path:
+        description: the directory that project.godot is in
         default: "."
         required: false
         type: string
+      github-pages:
+        description: to deploy to github pages or not to deploy to github pages
+        default: "true"
+        required: true
+        type: string # shut
     secrets:
-      android-keystore-base64: # will be filled with andrid debug keystore if left blank
+      android-keystore-base64:
+        description: For signing the apk, will be filled with andrid debug keystore if left blank
         required: false
       android-keystore-password:
+        description: For signing the apk, will be filled with andrid debug keystore if left blank
         required: false
       butler-api-key:
+        description: For deploying to itch.io
         required: false
 
 env:
@@ -75,6 +88,8 @@ jobs:
     steps:
       - name: Build
         uses: bend-n/godot-actions/.github/actions/export-web@main
+        with:
+          github-pages: ${{ inputs.github-pages }}
 
   android:
     runs-on: ubuntu-latest

@@ -31,7 +31,7 @@ build-windows:
 <summary>Full example</summary>
 
 > **Note**
-> This is a copy of [godot-template/.github/workflows/export.yml](https://github.com/bend-n/godot-template/blob/56b004dc6ad80b93549a15d4368e6fd953b26076/.github/workflows/export.yml)
+> This is a copy of [godot-template/.github/workflows/export.yml](https://github.com/bend-n/godot-template/blob/67c92540c4f8724d1d9994d546d4717c7d807e8f/.github/workflows/export.yml)
 
 ```yaml
 name: "export" # name of the workflow
@@ -53,15 +53,16 @@ jobs: # the things to do
   export: # a thing to do
     uses: bend-n/godot-actions/.github/workflows/callable-export.yml@main
     with: # variables
-      export-name: ${{ github.event.repository.name }} # the name of the zipfile
       godot-version: 3.5 # the godot version
       image: ghcr.io/bend-n/godot-2d:3.5 # the container to use
+      export-name: ${{ github.event.repository.name }} # the name of the exec. ($export-name.exe)
       platforms: "windows linux web android mac" # space seperated list of platforms to build
       project-root-path: "." # the directory that project.godot is in
+      github-pages: "true" # to deploy to github pages or not (anything besides 'true' == false)
     secrets: # secrets
-      android-keystore-base64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }} # not required
-      android-keystore-password: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} # not required
-      butler-api-key: ${{ secrets.BUTLER_CREDENTIALS }} # required for itch.io
+      android-keystore-base64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }} # for signing the apk, not required
+      android-keystore-password: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} # ditto
+      butler-api-key: ${{ secrets.BUTLER_CREDENTIALS }} # required for itch.io deployment
 ```
 
 </details>
