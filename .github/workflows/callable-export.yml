@@ -15,12 +15,12 @@ on:
       export-name:
         description: the name of the exec. ($export-name.exe)
         default: ${{ github.event.repository.name }}
-        required: true
+        required: false
         type: string
       platforms:
         description: space seperated platform list
         default: "windows linux web android mac"
-        required: true
+        required: false
         type: string
       project-root-path:
         description: the directory that project.godot is in
@@ -30,7 +30,7 @@ on:
       github-pages:
         description: to deploy to github pages or not to deploy to github pages
         default: "true"
-        required: true
+        required: false
         type: string # shut
     secrets:
       android-keystore-base64:
