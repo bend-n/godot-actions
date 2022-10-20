@@ -51,7 +51,7 @@ runs:
 
     - name: Test git repo
       id: is-repo
-      run: "echo ::set-output name=is-repo::$(git rev-parse --is-inside-work-tree || echo false)"
+      run: echo "is-repo=$(git rev-parse --is-inside-work-tree || echo false)" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: Deploy

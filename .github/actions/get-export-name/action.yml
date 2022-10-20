@@ -23,5 +23,5 @@ runs:
           echo "::error file=${PROJECT_PATH}/export_presets.cfg,title=Missing Configuration::No export for ${{ inputs.platform }}."
           exit 1
         )
-        echo "::set-output name=export-name::$(python get-export-name.py "${{ inputs.platform }}")"
+        echo "export-name=$(python get-export-name.py "${{ inputs.platform }}")" >> "$GITHUB_OUTPUT"
       shell: bash

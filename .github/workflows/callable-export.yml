@@ -118,7 +118,7 @@ jobs:
       - name: check
         id: secret
         run: |
-          function output() { echo "::set-output name=secret::$1"; }
+          function output() { echo "secret=$1" >> "$GITHUB_OUTPUT"; }
           if [[ -n "${{ secrets.butler-api-key }}" ]]; 
             then output "true";
             else output "false";

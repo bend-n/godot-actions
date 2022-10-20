@@ -7,8 +7,8 @@ runs:
     - name: Check if clean
       id: clean
       run: |
-        if [[ -z $(find . -mindepth 1 -maxdepth 1) ]]; then echo "::set-output name=clean::true";
-        else echo "::set-output name=clean::false"; fi
+        if [[ -z $(find . -mindepth 1 -maxdepth 1) ]]; then echo "clean=true" >> "$GITHUB_OUTPUT";
+        else echo "clean=false" >> "$GITHUB_OUTPUT"; fi
       shell: bash
 
     - name: Checkout
