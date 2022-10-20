@@ -31,7 +31,7 @@ build-windows:
 <summary>Full example</summary>
 
 > **Note**
-> This is a copy of [godot-template/.github/workflows/export.yml](https://github.com/bend-n/godot-template/blob/67c92540c4f8724d1d9994d546d4717c7d807e8f/.github/workflows/export.yml)
+> This is a copy of [godot-template/.github/workflows/export.yml](https://github.com/bend-n/godot-template/blob/d009ad9ba50e5d84360d8de9a1b7beceae3e3cd0/.github/workflows/export.yml)
 
 ```yaml
 name: "export" # name of the workflow
@@ -59,10 +59,11 @@ jobs: # the things to do
       platforms: "windows linux web android mac" # space seperated list of platforms to build
       project-root-path: "." # the directory that project.godot is in
       github-pages: "true" # to deploy to github pages or not (anything besides 'true' == false)
+      itch-path: "${{ github.repository_owner }}/${{ github.event.repository.name }}" # required for itch.io deployment.
     secrets: # secrets
+      butler-api-key: ${{ secrets.BUTLER_CREDENTIALS }} # required for itch.io deployment
       android-keystore-base64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }} # for signing the apk, not required
       android-keystore-password: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} # ditto
-      butler-api-key: ${{ secrets.BUTLER_CREDENTIALS }} # required for itch.io deployment
 ```
 
 </details>

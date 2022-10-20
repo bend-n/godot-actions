@@ -32,6 +32,11 @@ on:
         default: "true"
         required: false
         type: string # shut
+      itch-path:
+        description: "the itch.io path to export to, eg: bendn/chess"
+        default: "${{ github.repository_owner }}/${{ github.event.repository.name }}"
+        required: false
+        type: string
     secrets:
       android-keystore-base64:
         description: For signing the apk, will be filled with andrid debug keystore if left blank
@@ -106,11 +111,22 @@ jobs:
 
   push-itch:
     needs: [linux, android, windows, mac, web]
-    if: always() && inputs.butler-api-key # run even if the previous jobs were skipped
+    if: always() # run even if the previous jobs were skipped
     name: Push to itch.io
     runs-on: ubuntu-20.04
     steps:
+      - name: check
+        id: secret
+        run: |
+          function output() { echo "::set-output name=secret::$1"; }
+          if [[ -n "${{ secrets.butler-api-key }}" ]]; 
+            then output "true";
+            else output "false";
+          fi
+
       - name: Push
+        if: steps.secret.outputs.secret == 'true'
         uses: bend-n/godot-actions/.github/actions/itch-push@main
         with:
           api-key: ${{ secrets.butler-api-key }}
+          itch-path: ${{ inputs.itch-path }}
