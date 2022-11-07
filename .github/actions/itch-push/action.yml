@@ -23,15 +23,17 @@ runs:
       run: |
         function push() {
           channel=$1
-          [[ ! -d $channel ]] && exit 0
+          [[ ! -d $channel ]] && return 0
           echo "::group::Push $channel"
-          [[ $channel == mac ]] && echo -e '#!/bin/bash\ncd "$(dirname "$0")";\nxattr -cr "$(pwd)/${{ env.NAME }}.app";\nopen -n -a "$(pwd)/${{ env.NAME }}.app"' >./mac/run.sh
-          chmod +x **;
+          chmod +x "$channel/"*;
           butler push "$channel" "${{ inputs.itch-path }}:$channel"
           echo "::endgroup::"
         }
-        push "web"; push "linux"; push "windows"; 
-        [[ -d mac ]] && unzip "mac/${{ env.NAME }}.zip" -d mac/ && rm "mac/${{ env.NAME }}.zip" && push "mac"
+        push "web"; push "linux"; push "windows";
+        [[ -d mac ]] && unzip "mac/${{ env.NAME }}.zip" -d mac/ \
+                     && rm "mac/${{ env.NAME }}.zip" \
+                     && echo -e '#!/bin/bash\ncd "$(dirname "$0")";\nxattr -cr "$(pwd)/${{ env.NAME }}.app";\nopen -n -a "$(pwd)/${{ env.NAME }}.app"' >./mac/run.sh \
+                     && push "mac"
         [[ -d android ]] && rm android/*.idsig && push "android"
       env:
         BUTLER_API_KEY: ${{ inputs.api-key }}
