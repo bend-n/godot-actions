@@ -6,12 +6,12 @@ on:
         description: the godot version
         default: 3.5
         required: true
-        type: number
+        type: string
       image:
         description: the container to use
         default: ghcr.io/bend-n/godot-2d:3.5
-        type: string
         required: true
+        type: string
       export-name:
         description: the name of the exec. ($export-name.exe)
         default: ${{ github.event.repository.name }}

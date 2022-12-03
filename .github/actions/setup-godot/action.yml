@@ -20,40 +20,59 @@ runs:
         submodules: recursive
 
     - name: Setup python
+      if: steps.clean.outputs.clean == 'true'
       uses: actions/setup-python@v4
       with:
         python-version: "3.9"
+        cache: pip
 
     - name: Setup godot
+      if: steps.clean.outputs.clean == 'true'
       run: |
+        echo "::group::Pip install"
+        python -m pip install packaging
+        echo "::endgroup::"
         echo "::group::Setup godot"
+        wget -q 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/actions/setup-godot/parse.py' -O pv.py
 
         # config
         mkdir -p ~/.config/godot/
         mv /root/.config/godot/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
-        if [[ -z $PROJECT_PATH ]]; then
-          cd "$PROJECT_PATH"
-          echo "PROJECT_PATH=." >> $GITHUB_ENV
-        fi
+        [[ -z $PROJECT_PATH ]] && echo "PROJECT_PATH=." >>$GITHUB_ENV
+        cd "$PROJECT_PATH" || true
 
         # create version label thing
-        git config --global --add safe.directory "$(pwd)" && printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)" > version
+        git config --global --add safe.directory "$(pwd)" && printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)" >version
 
         # templates
-        [[ -z $RELEASE ]] && RELEASE=stable
-        TEMPLATES_PATH=".local/share/godot/templates/${GODOT_VERSION}.${RELEASE}"
-        mkdir -p "${HOME}/${TEMPLATES_PATH}"
-        mv "/root/${TEMPLATES_PATH}/"* "${HOME}/${TEMPLATES_PATH}"
-        ls "${HOME}/${TEMPLATES_PATH}"| tr '\n' ' '
+        TEMPS_DIRNAME="templates"
+        [[ ${GODOT_VERSION:0:1} -gt 3 ]] && TEMPS_DIRNAME="export_templates"
+        VERSION="$(python pv.py "$GODOT_VERSION")"
+        TEMPLATES_PATH=".local/share/godot/$TEMPS_DIRNAME/$VERSION"
+        echo "Putting export templates in $TEMPLATES_PATH."
+        mkdir -p "$HOME/$TEMPLATES_PATH"
+        if [[ -f /root/templates.tpz ]]; then # brand new container
+          mkdir -p ~/.cache
+          unzip -q /root/templates.tpz -d "$HOME/$TEMPLATES_PATH"
+        else # fallback to the old container method
+          mv "/root/$TEMPLATES_PATH/"* "$HOME/$TEMPLATES_PATH"
+        fi
+        echo -e "Installed templates: $(ls "$HOME/$TEMPLATES_PATH" | tr '\n' ' ')\n"
 
         # gpm
         if [[ -f godot.package ]]; then
+          echo "Installing addons via the GPM"
+          if [[ ${GODOT_VERSION:0:1} -gt 3 ]]; then
+            wget -q "https://github.com/bend-n/godot-builds/releases/download/3.5/godot-2d_v3.5_linux_headless.64" -O /usr/local/bin/godot3
+            chmod +x /usr/local/bin/godot3
+          else
+            ln -s /usr/local/bin/godot /usr/local/bin/godot3
+          fi
           [[ ! -d addons ]] && mkdir addons
-          git clone --depth 1 https://github.com/you-win/godot-package-manager
+          git clone -q --depth 1 https://github.com/you-win/godot-package-manager
           mv godot-package-manager/addons/godot-package-manager addons/
-          rm -rf godot-package-manager
-          godot -s addons/godot-package-manager/cli.gd update
-          rm -rf addons/godot-package-manager
+          godot3 -s addons/godot-package-manager/cli.gd update || true
+          rm -rf addons/godot-package-manager godot-package-manager
         fi
         echo "::endgroup::"
       shell: bash

@@ -19,9 +19,9 @@ runs:
       run: |
         cd "${{ env.PROJECT_PATH }}"
         wget -nv 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/actions/get-export-name/get-export-name.py' -O get-export-name.py
-        python get-export-name.py "${{ inputs.platform }}" || (
+        python get-export-name.py "${GODOT_VERSION:0:1}" "${{ inputs.platform }}" || (
           echo "::error file=${PROJECT_PATH}/export_presets.cfg,title=Missing Configuration::No export for ${{ inputs.platform }}."
           exit 1
         )
-        echo "export-name=$(python get-export-name.py "${{ inputs.platform }}")" >> "$GITHUB_OUTPUT"
+        echo "export-name=$(python get-export-name.py "${GODOT_VERSION:0:1}" "${{ inputs.platform }}")" >> "$GITHUB_OUTPUT"
       shell: bash

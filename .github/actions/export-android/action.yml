@@ -16,12 +16,6 @@ runs:
     - name: Setup
       uses: bend-n/godot-actions/.github/actions/setup-godot@main
 
-    - name: Get export name
-      id: get-export-name
-      uses: bend-n/godot-actions/.github/actions/get-export-name@main
-      with:
-        platform: Android
-
     - name: Download android sdks
       run: |
         # Generate android keystore and settings
@@ -39,38 +33,19 @@ runs:
         fi
       shell: bash
 
-    - name: Build (release)
+    - name: Prep build
       if: inputs.android-keystore-base64
       run: |
         password="${{ inputs.android-password }}"
         echo "::group::Build android (release)"
         echo "${{ inputs.android-keystore-base64 }}" | base64 --decode > ~/release.keystore && echo "Decoded keystore"
-        alias=$(keytool -storepass "$password" -list -v -keystore ~/release.keystore |  grep -E '^Alias name:\s*(.+)$' |  cut -d ' ' -f 3-) && echo "Got alias name"
+        alias=$(keytool -storepass "$password" -list -v -keystore ~/release.keystore |  grep -E '^Alias name:\s*(.+)$' | cut -d ' ' -f 3-) && echo "Got alias name"
         sed "s@keystore/release=\"\"@keystore/release=\"$HOME/release.keystore\"@g" -i export_presets.cfg && sed 's@keystore/release_user=".*"@keystore/release_user="'$alias'"@g' -i export_presets.cfg && sed 's@keystore/release_password=".*"@keystore/release_password="'$password'"@g' -i export_presets.cfg && echo "Configured export_presets.cfg"
-        mkdir -p build/android
-        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/android/${{ env.NAME }}.apk)"
-        echo "::endgroup::"
       shell: bash
 
-    - name: Build (debug)
-      if: ${{ !inputs.android-keystore-base64 }}
-      run: |
-        echo "::group::Build android (debug)"
-        mkdir -p build/android || true
-        godot -v --path "${{ env.PROJECT_PATH }}" --export-debug "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/android/${{ env.NAME }}.apk)"
-        echo "::endgroup::"
-      shell: bash
-
-    - name: Add extra files
-      run: |
-        if [[ -f .github/post_export ]]; then
-          chmod +x .github/post_export
-          ./.github/post_export android
-        fi
-      shell: bash
-
-    - name: Upload
-      uses: actions/upload-artifact@v3
+    - name: Build
+      uses: bend-n/godot-actions/.github/actions/export@main
       with:
-        name: android
-        path: build/android
+        debug: ${{ inputs.android-keystore-base64 }}
+        extension: apk
+        platform: android

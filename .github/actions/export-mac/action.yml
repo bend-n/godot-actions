@@ -4,33 +4,8 @@ description: Mac export
 runs:
   using: composite
   steps:
-    - name: Setup
-      uses: bend-n/godot-actions/.github/actions/setup-godot@main
-
-    - name: Get export name
-      id: get-export-name
-      uses: bend-n/godot-actions/.github/actions/get-export-name@main
+    - name: Build
+      uses: bend-n/godot-actions/.github/actions/export@main
       with:
-        platform: "Mac OSX"
-
-    - name: Mac Build
-      run: |
-        echo "::group::Mac Build"
-        mkdir -vp build/mac
-        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/mac/${{ env.NAME }}.zip)"
-        echo "::endgroup::"
-      shell: bash
-
-    - name: Add extra files
-      run: |
-        if [[ -f .github/post_export ]]; then
-          chmod +x .github/post_export
-          ./.github/post_export mac
-        fi
-      shell: bash
-
-    - name: Upload
-      uses: actions/upload-artifact@v3
-      with:
-        name: mac
-        path: build/mac
+        extension: app
+        platform: mac

@@ -18,36 +18,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Setup
-      uses: bend-n/godot-actions/.github/actions/setup-godot@main
-
-    - name: Get export name
-      id: get-export-name
-      uses: bend-n/godot-actions/.github/actions/get-export-name@main
+    - name: Build
+      uses: bend-n/godot-actions/.github/actions/export@main
       with:
-        platform: HTML5
-
-    - name: Web Build
-      run: |
-        echo "::group::Web Build"
-        mkdir -vp build/web
-        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/web/index.html)"
-        echo "::endgroup::"
-      shell: bash
-
-    - name: Add extra files
-      run: |
-        if [[ -f .github/post_export ]]; then
-          chmod +x .github/post_export
-          ./.github/post_export web
-        fi
-      shell: bash
-
-    - name: Upload
-      uses: actions/upload-artifact@v3
-      with:
-        name: web
-        path: build/web
+        name: index
+        extension: html
+        platform: web
 
     - name: Test git repo
       id: is-repo

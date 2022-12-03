@@ -4,32 +4,8 @@ description: Linux export
 runs:
   using: composite
   steps:
-    - name: Setup
-      uses: bend-n/godot-actions/.github/actions/setup-godot@main
-
-    - name: Get export name
-      id: get-export-name
-      uses: bend-n/godot-actions/.github/actions/get-export-name@main
+    - name: Build
+      uses: bend-n/godot-actions/.github/actions/export@main
       with:
-        platform: Linux/X11
-
-    - name: Linux Build
-      run: |
-        echo "::group::Linux Build"
-        mkdir -vp build/linux
-        godot -v --path "${{ env.PROJECT_PATH }}" --export "${{ steps.get-export-name.outputs.export-name }}" "$(realpath ./build/linux/${{ env.NAME }}.x86_64)"
-        echo "::endgroup::"
-      shell: bash
-
-    - name: Add extra files
-      run: |
-        if [[ -f .github/post_export ]]; then
-          chmod +x .github/post_export
-          ./.github/post_export linux
-        fi
-      shell: bash
-
-    - uses: actions/upload-artifact@v3
-      with:
-        name: linux
-        path: build/linux
+        extension: x86_64
+        platform: linux
