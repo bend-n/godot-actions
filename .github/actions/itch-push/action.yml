@@ -8,7 +8,6 @@ inputs:
   itch-path:
     description: "The path to the itch.io project eg: leafo/x-moon"
     required: false
-    default: ""
 
 runs:
   using: composite
@@ -30,9 +29,7 @@ runs:
           echo "::endgroup::"
         }
         push "web"; push "linux"; push "windows";
-        [[ -d mac ]] && unzip "mac/${{ env.NAME }}.zip" -d mac/ \
-                     && rm "mac/${{ env.NAME }}.zip" \
-                     && echo -e '#!/bin/bash\ncd "$(dirname "$0")";\nxattr -cr "$(pwd)/${{ env.NAME }}.app";\nopen -n -a "$(pwd)/${{ env.NAME }}.app"' >./mac/run.sh \
+        [[ -d mac ]] && echo -e '#!/bin/bash\ncd "$(dirname "$0")";\nxattr -cr "$(pwd)/${{ env.NAME }}.app";\nopen -n -a "$(pwd)/${{ env.NAME }}.app"' >./mac/run.sh \
                      && push "mac"
         [[ -d android ]] && rm android/*.idsig && push "android"
       env:

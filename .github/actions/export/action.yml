@@ -9,9 +9,9 @@ inputs:
     description: File extension (x86_64, exe, etc)
     required: true
   debug:
-    description: Debug build or no (non empty string = true)
+    description: Debug build or no (empty string = debug)
     required: false
-    default: ""
+    default: "false"
   name:
     description: The name ($name.exe) # defaults to $NAME
     required: false
@@ -34,10 +34,10 @@ runs:
         echo "::group::${p^} Build"
         export="--export"
         [[ ${GODOT_VERSION:0:1} -gt 3 ]] && export="--export-release"
-        [[ -n $debug ]] && export="--export-debug"
+        [[ -z $debug ]] && export="--export-debug"
         mkdir -vp build/${{ inputs.platform }}
-        n="$NAME"
-        [[ -z "${{ inputs.name}}" ]] && n="${{ inputs.name }}"
+        n="${{ env.NAME }}"
+        [[ -n "${{ inputs.name }}" ]] && n="${{ inputs.name }}"
         godot -v --headless --path "${{ env.PROJECT_PATH }}" "$export" "${{ steps.n.outputs.export-name }}" "./build/${{ inputs.platform }}/$n.${{ inputs.extension }}"
         echo "::endgroup::"
 
