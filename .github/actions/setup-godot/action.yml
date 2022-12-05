@@ -28,9 +28,6 @@ runs:
     - name: Setup godot
       if: steps.clean.outputs.clean == 'true'
       run: |
-        echo "::group::Pip install"
-        python -m pip install packaging
-        echo "::endgroup::"
         echo "::group::Setup godot"
         wget -q 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/actions/setup-godot/parse.py' -O pv.py
 
