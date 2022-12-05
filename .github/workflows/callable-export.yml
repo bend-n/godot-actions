@@ -3,10 +3,11 @@ on:
   workflow_call:
     inputs:
       godot-version:
-        description: the godot version
-        default: 3.5
-        required: true
+        description: the godot version (deprecated, this is now parsed out of the image input)
+        required: false
         type: string
+        # deprecationMessage: This is parsed out of the image input.
+        # deprecation message doesnt work, done manually.
       image:
         description: the container to use
         default: ghcr.io/bend-n/godot-2d:3.5
@@ -49,11 +50,19 @@ on:
         required: false
 
 env:
-  GODOT_VERSION: ${{ inputs.godot-version }}
   PROJECT_PATH: ${{ inputs.project-root-path }}
   NAME: ${{ inputs.export-name }}
 
 jobs:
+  deprecation-warn:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.godot-version }}
+    name: Warn for deprecation
+    steps:
+      - name: version deprecation warn
+        if: ${{ inputs.godot-version }}
+        run: echo "::warning title=input.godot-version deprecated::Version now parsed out of input.image"
+
   linux:
     runs-on: ubuntu-latest
     if: contains(inputs.platforms, 'linux')
@@ -61,6 +70,9 @@ jobs:
       image: ${{ inputs.image }}
     name: Linux
     steps:
+      - name: Get ver
+        run: echo "GODOT_VERSION=$(echo ${{ inputs.image }} | cut -d':' -f2-)" >> $GITHUB_ENV
+
       - name: Build
         uses: bend-n/godot-actions/.github/actions/export-linux@main
 
@@ -71,6 +83,9 @@ jobs:
       image: ${{ inputs.image }}
     name: Windows
     steps:
+      - name: Get ver
+        run: echo "GODOT_VERSION=$(echo ${{ inputs.image }} | cut -d':' -f2-)" >> $GITHUB_ENV
+
       - name: Build
         uses: bend-n/godot-actions/.github/actions/export-windows@main
 
@@ -81,6 +96,9 @@ jobs:
       image: ${{ inputs.image }}
     name: macOS
     steps:
+      - name: Get ver
+        run: echo "GODOT_VERSION=$(echo ${{ inputs.image }} | cut -d':' -f2-)" >> $GITHUB_ENV
+
       - name: Build
         uses: bend-n/godot-actions/.github/actions/export-mac@main
 
@@ -91,6 +109,9 @@ jobs:
       image: ${{ inputs.image }}
     name: HTML5
     steps:
+      - name: Get ver
+        run: echo "GODOT_VERSION=$(echo ${{ inputs.image }} | cut -d':' -f2-)" >> $GITHUB_ENV
+
       - name: Build
         uses: bend-n/godot-actions/.github/actions/export-web@main
         with:
@@ -103,6 +124,9 @@ jobs:
       image: ${{ inputs.image }}
     name: Android
     steps:
+      - name: Get ver
+        run: echo "GODOT_VERSION=$(echo ${{ inputs.image }} | cut -d':' -f2-)" >> $GITHUB_ENV
+
       - name: Build
         uses: bend-n/godot-actions/.github/actions/export-android@main
         with:
