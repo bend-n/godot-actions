@@ -19,7 +19,7 @@ body:
     attributes:
       render: YAML
       label: Workflow
-      description: The workflow your using
+      description: The workflow your using. Please upload the entire workflow, not just a snippet, or "this workflow from here".
     validations:
       required: true
   - type: textarea
@@ -31,7 +31,7 @@ body:
   - type: textarea
     attributes:
       label: Version
-      description: The version that you are using
+      description: The version that you are using. Use a hash or a branch name.
       placeholder: main
       value: main
     validations:
