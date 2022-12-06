@@ -4,37 +4,41 @@ description: Setup godot and repo
 runs:
   using: "composite"
   steps:
-    - name: Check if clean
-      id: clean
+    - name: Check if setup needed
+      id: setup
       run: |
-        if [[ -z $(find . -mindepth 1 -maxdepth 1) ]]; then echo "clean=true" >> "$GITHUB_OUTPUT";
-        else echo "clean=false" >> "$GITHUB_OUTPUT"; fi
+        if [[ ! -d ~/.config/godot ]];
+          then echo "needed=true" >> "$GITHUB_OUTPUT"; echo "::debug::need get deps";
+        else
+          echo "needed=false" >> "$GITHUB_OUTPUT"; echo "::debug::no need get deps"; 
+        fi
       shell: bash
 
     - name: Checkout
-      if: steps.clean.outputs.clean == 'true'
+      if: steps.setup.outputs.needed == 'true'
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
         lfs: true
         submodules: recursive
+        path: repo
 
     - name: Setup python
-      if: steps.clean.outputs.clean == 'true'
+      if: steps.setup.outputs.needed == 'true'
       uses: actions/setup-python@v4
       with:
         python-version: "3.9"
 
     - name: Setup godot
-      if: steps.clean.outputs.clean == 'true'
+      if: steps.setup.outputs.needed == 'true'
       run: |
         echo "::group::Setup godot"
-        wget -q 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/actions/setup-godot/parse.py' -O pv.py
 
         # config
         mkdir -p ~/.config/godot/
         mv /root/.config/godot/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
-        [[ -z $PROJECT_PATH ]] && echo "PROJECT_PATH=." >>$GITHUB_ENV
+        PROJECT_PATH="$(wget -q 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/actions/setup-godot/project_path.py' -O - | python - "$PROJECT_PATH")"
+        echo "PROJECT_PATH=$PROJECT_PATH" >>$GITHUB_ENV
         cd "$PROJECT_PATH" || true
 
         # create version label thing
@@ -43,7 +47,7 @@ runs:
         # templates
         TEMPS_DIRNAME="templates"
         [[ ${GODOT_VERSION:0:1} -gt 3 ]] && TEMPS_DIRNAME="export_templates"
-        VERSION="$(python pv.py "$GODOT_VERSION")"
+        VERSION="$(wget -q 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/actions/setup-godot/parse.py' -O - | python - "$GODOT_VERSION")"
         TEMPLATES_PATH=".local/share/godot/$TEMPS_DIRNAME/$VERSION"
         echo "Putting export templates in $TEMPLATES_PATH."
         mkdir -p "$HOME/$TEMPLATES_PATH"

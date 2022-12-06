@@ -24,7 +24,7 @@ on:
         required: false
         type: string
       project-root-path:
-        description: the directory that project.godot is in
+        description: the directory that project.godot is in (relative to repo root)
         default: "."
         required: false
         type: string

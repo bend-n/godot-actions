@@ -37,6 +37,7 @@ runs:
       if: inputs.android-keystore-base64
       run: |
         echo "::group::Prep build"
+        cd "$PROJECT_PATH"
         password="${{ inputs.android-password }}"
         echo "${{ inputs.android-keystore-base64 }}" | base64 --decode > ~/release.keystore && echo "Decoded keystore"
         alias="$(keytool -storepass "$password" -list -v -keystore ~/release.keystore | grep -E '^Alias name:\s*(.+)$' | cut -d ' ' -f 3-)" && echo "Got alias name"

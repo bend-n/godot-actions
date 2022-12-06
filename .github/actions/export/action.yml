@@ -30,6 +30,7 @@ runs:
 
     - name: Build
       run: |
+        cd "$PROJECT_PATH"
         p="${{ inputs.platform }}"
         echo "::group::${p^} Build"
         export="--export"
@@ -38,7 +39,7 @@ runs:
         mkdir -vp build/${{ inputs.platform }}
         n="${{ env.NAME }}"
         [[ -n "${{ inputs.name }}" ]] && n="${{ inputs.name }}"
-        godot -v --headless --path "${{ env.PROJECT_PATH }}" "$export" "${{ steps.n.outputs.export-name }}" "./build/${{ inputs.platform }}/$n.${{ inputs.extension }}"
+        godot -v --headless "$export" "${{ steps.n.outputs.export-name }}" "./build/${{ inputs.platform }}/$n.${{ inputs.extension }}"
         echo "::endgroup::"
 
         if [[ -f .github/post_export ]]; then
@@ -52,5 +53,5 @@ runs:
     - uses: actions/upload-artifact@v3
       with:
         name: ${{ inputs.platform }}
-        path: build/${{ inputs.platform}}
+        path: ${{ env.PROJECT_PATH }}/build/${{ inputs.platform }}
         if-no-files-found: error
