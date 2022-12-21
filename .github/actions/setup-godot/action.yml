@@ -10,7 +10,7 @@ runs:
         if [[ ! -d ~/.config/godot ]];
           then echo "needed=true" >> "$GITHUB_OUTPUT"; echo "::debug::need get deps";
         else
-          echo "needed=false" >> "$GITHUB_OUTPUT"; echo "::debug::no need get deps"; 
+          echo "needed=false" >> "$GITHUB_OUTPUT"; echo "::debug::no need get deps";
         fi
       shell: bash
 
@@ -62,17 +62,10 @@ runs:
         # gpm
         if [[ -f godot.package ]]; then
           echo "Installing addons via the GPM"
-          if [[ ${GODOT_VERSION:0:1} -gt 3 ]]; then
-            wget -q "https://github.com/bend-n/godot-builds/releases/download/3.5/godot-2d_v3.5_linux_headless.64" -O /usr/local/bin/godot3
-            chmod +x /usr/local/bin/godot3
-          else
-            ln -s /usr/local/bin/godot /usr/local/bin/godot3
-          fi
-          [[ ! -d addons ]] && mkdir addons
-          git clone -q --depth 1 https://github.com/you-win/godot-package-manager
-          mv godot-package-manager/addons/godot-package-manager addons/
-          godot3 -s addons/godot-package-manager/cli.gd update || true
-          rm -rf addons/godot-package-manager godot-package-manager
+          wget -q "https://github.com/godot-package-manager/cli/releases/latest/download/godot-package-manager" -O gpm
+          chmod +x gpm
+          ./gpm update --cfg-file godot.package --lock-file /dev/null
+          rm gpm
         fi
         echo "::endgroup::"
       shell: bash
