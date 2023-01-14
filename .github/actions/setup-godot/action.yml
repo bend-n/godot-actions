@@ -62,7 +62,7 @@ runs:
         # gpm
         if [[ -f godot.package ]]; then
           echo "Installing addons via the GPM"
-          wget -q "https://github.com/godot-package-manager/cli/releases/latest/download/godot-package-manager" -O gpm
+          wget -q "https://github.com/godot-package-manager/cli/releases/latest/download/godot-package-manager.x86_64" -O gpm
           chmod +x gpm
           ./gpm update --cfg-file godot.package --lock-file /dev/null
           rm gpm
