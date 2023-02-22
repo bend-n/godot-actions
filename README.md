@@ -21,7 +21,6 @@ build-windows:
     - name: Build
       uses: bend-n/godot-actions/.github/actions/export-windows@main
       env:
-        GODOT_VERSION: 3.5
         NAME: ${{ github.event.repository.name }}
 ```
 
@@ -31,7 +30,7 @@ build-windows:
 <summary>Full example</summary>
 
 > **Note**
-> This is a copy of [godot-template/.github/workflows/export.yml](https://github.com/bend-n/godot-template/blob/d009ad9ba50e5d84360d8de9a1b7beceae3e3cd0/.github/workflows/export.yml)
+> This is a copy of [godot-template/.github/workflows/export.yml](https://github.com/bend-n/godot-template/blob/9c9e2b02ddf9f88bff872dcd2695363d09485bc4/.github/workflows/export.yml)
 
 ```yaml
 name: "export" # name of the workflow
@@ -53,7 +52,6 @@ jobs: # the things to do
   export: # a thing to do
     uses: bend-n/godot-actions/.github/workflows/callable-export.yml@main
     with: # variables
-      godot-version: 3.5 # the godot version
       image: ghcr.io/bend-n/godot-2d:3.5 # the container to use
       export-name: ${{ github.event.repository.name }} # the name of the exec. ($export-name.exe)
       platforms: "windows linux web android mac" # space seperated list of platforms to build
