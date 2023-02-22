@@ -20,11 +20,11 @@ map = {
     }
 }
 
-platform = f'"{map[int(sys.argv[1])][sys.argv[2]]}"'
+platform = f'{map[int(sys.argv[1])][sys.argv[2]]}'
 
 with open('export_presets.cfg', "r") as f:
     export_presets = f.read()
-    regex = r'\[preset.[0-9]\]\n+name="([A-Za-z0-9]+)"\n+platform=' + platform
+    regex = r'\[preset.[0-9]+\]\n+name="(.+)"\n+platform="%s"' % platform
     matches = re.search(
         regex, export_presets)
     if matches:
