@@ -37,6 +37,7 @@ runs:
         # config
         mkdir -p ~/.config/godot/
         mv /root/.config/godot/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
+        mv /root/.config/godot/editor_settings-4.tres ~/.config/godot/editor_settings-4.tres || true
         PROJECT_PATH="$(wget -q 'https://raw.githubusercontent.com/bend-n/godot-actions/main/.github/actions/setup-godot/project_path.py' -O - | python - "$PROJECT_PATH")"
         echo "PROJECT_PATH=$PROJECT_PATH" >>$GITHUB_ENV
         cd "$PROJECT_PATH" || true
