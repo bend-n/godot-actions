@@ -67,12 +67,5 @@ runs:
           ./gpm update --cfg-file godot.package --lock-file /dev/null
           rm gpm
         fi
-
-        # populate .import
-        if [[ ! -d .import ]]; then
-          [[ -z $TIMEOUT_TIME ]] && TIMEOUT_TIME="60"
-          echo "Populate .import"
-          timeout $TIMEOUT_TIME godot -e --no-window --headless || true # necessary unreliable workaround due to https://github.com/godotengine/godot/issues/69511
-        fi
         echo "::endgroup::"
       shell: bash
