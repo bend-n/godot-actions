@@ -78,3 +78,5 @@ Bash example:
 #!/bin/bash
 [[ $1 == "web" ]] && wget -nv "example.org" -O build/web/example.html
 ```
+
+A `pre_export` file is also supported.

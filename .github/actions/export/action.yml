@@ -30,6 +30,12 @@ runs:
 
     - name: Build
       run: |
+        if [[ -f .github/pre_export ]]; then
+          echo "::group::Run pre export script"
+          chmod +x .github/pre_export
+          ./.github/pre_export ${{ inputs.platform }}
+          echo "::endgroup::"
+        fi
         cd "$PROJECT_PATH"
         p="${{ inputs.platform }}"
         echo "::group::${p^} Build"
