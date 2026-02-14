@@ -25,7 +25,7 @@ runs:
 
     - name: Setup python
       if: steps.setup.outputs.needed == 'true'
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
       with:
         python-version: "3.9"
 
